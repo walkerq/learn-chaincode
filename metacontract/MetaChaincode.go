@@ -1,24 +1,20 @@
-/*
-Copyright IBM Corp. 2016 All Rights Reserved.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-		 http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+/* How would we implement MetaContract in Go?
+Each SmartestContract has a
+    address contractAddress;
+    string creator;
+    string approver;
+    int public state = 1;
+    int public maxStateOnchain;
+    string public dateOnchain;
+    string public commentOnchain; // set by approver
+
+    Considerations:
+    If we dump SmartestContracts into a single MetaContract (as opposed to referencing)
+    we lose each contract's unique functions. That is ok, and how it should have been
+    designed originally. However, we should still allow contracts to have some custom
+    key/value pairs.
 */
 
-// TO-DO:
-/*add commentOnchain:
-dateOnchain: Oct 24, 2016
-key1Onchain: asd
-maxStateOnchain: 2
-recipientOnchain: Frank
-senderOnchain: Dorothy
-*/
 package main
 
 import (
@@ -29,31 +25,22 @@ import (
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
 
-// This chaincode implements a simple map that is stored in the state.
-// The following operations are available.
-
-// Invoke operations
-// put - requires two arguments, a key and value
-// remove - requires a key
-
-// Query operations
-// get - requires one argument, a key, and returns a value
-// keys - requires no arguments, returns all keys
+//Problem: map example was wrong version of Fabric (we need archived version v0.5)
 
 // SimpleChaincode example simple Chaincode implementation
 type SimpleChaincode struct {
 }
 
 // Init is a no-op
-func (t *SimpleChaincode) Init(stub *shim.ChaincodeStub, function string, args []string) ([]byte, error) {
+func (t *SimpleChaincode) Init(stub *shim.ChaincodeStub) ([]byte, error) {
 	return nil, nil
 }
 
 // Invoke has two functions
 // put - takes two arguements, a key and value, and stores them in the state
 // remove - takes one argument, a key, and removes if from the state
-func (t *SimpleChaincode) Invoke(stub *shim.ChaincodeStub, function string, args []string) ([]byte, error) {
-
+func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStub) ([]byte, error) {
+	function, args := stub.GetFunctionAndParameters()
 	switch function {
 	case "put":
 		if len(args) < 2 {
@@ -89,8 +76,8 @@ func (t *SimpleChaincode) Invoke(stub *shim.ChaincodeStub, function string, args
 // Query has two functions
 // get - takes one argument, a key, and returns the value for the key
 // keys - returns all keys stored in this chaincode
-func (t *SimpleChaincode) Query(stub *shim.ChaincodeStub, function string, args []string) ([]byte, error) {
-
+func (t *SimpleChaincode) Query(stub shim.ChaincodeStub) ([]byte, error) {
+	function, args := stub.GetFunctionAndParameters()
 	switch function {
 
 	case "get":
